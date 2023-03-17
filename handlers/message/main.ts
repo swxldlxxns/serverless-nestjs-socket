@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { AppModule } from '/opt/src/app.module';
-import { formatResponse } from '/opt/src/libs/utils';
+import { AppService } from '/opt/src/app.service';
 
 const SERVICE_NAME = 'AppModule';
 
@@ -18,6 +18,10 @@ exports.handler = async function (
   context: Context,
 ): Promise<APIGatewayProxyResult> {
   console.info({ SERVICE_NAME, event, context });
-  await bootstrap();
-  return formatResponse(SERVICE_NAME);
+  const app = await bootstrap();
+  const appService = app.get(AppService);
+  return await appService.message(
+    event.body,
+    event.requestContext.connectionId,
+  );
 };

@@ -68,6 +68,16 @@ functions:
           route: $connect
       - websocket:
           route: $disconnect
+  message:
+    handler: dist/handlers/message/main.handler
+    package:
+      patterns:
+        - '!**'
+        - 'dist/handlers/message/**'
+    layers:
+      - !Ref ModulesLambdaLayer
+      - !Ref SrcLambdaLayer
+    events:
       - websocket:
           route: $default
       - websocket:
