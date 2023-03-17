@@ -24,10 +24,12 @@ exports.handler = async function (
   const appService = app.get(AppService);
   const param = await validateDto(MessageRequestsDto, checkBody(event.body));
   const errors = await errorsDto(param);
-  if (errors.length)
+  if (errors.length) {
+    console.error({ SERVICE_NAME, errors });
     return await appService.message(
       event.requestContext?.connectionId,
       'message error',
     );
+  }
   return await appService.message(param.data.id, param.data.message);
 };
