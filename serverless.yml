@@ -20,6 +20,14 @@ provider:
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
     WS: ${file(ServerlessScripts.js):domainName}
+    LAMBDA_MESSAGE: ${self:service}-${self:provider.stage}-message
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:*
+          Resource: '*'
 
 custom:
   modulesLayer: ${self:service}-${self:provider.stage}-modules
@@ -66,8 +74,6 @@ functions:
     events:
       - websocket:
           route: $connect
-      - websocket:
-          route: $disconnect
   message:
     handler: dist/handlers/message/main.handler
     package:

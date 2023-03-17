@@ -22,6 +22,6 @@ exports.handler = async function (
   const appService = app.get(AppService);
   return await appService.message(
     event.body,
-    event.requestContext.connectionId,
+    event.requestContext?.connectionId,
   );
 };

@@ -3,6 +3,9 @@ export interface Environments {
   stage: string;
   region: string;
   ws: string;
+  lambda: {
+    message: string;
+  };
 }
 
 export const ENV_VARS: Environments = {
@@ -10,4 +13,7 @@ export const ENV_VARS: Environments = {
   stage: process.env.STAGE,
   region: process.env.REGION,
   ws: process.env.WS,
+  lambda: {
+    message: process.env.LAMBDA_MESSAGE,
+  },
 };
