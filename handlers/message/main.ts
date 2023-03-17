@@ -4,6 +4,8 @@ import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { AppModule } from '/opt/src/app.module';
 import { AppService } from '/opt/src/app.service';
+import { MessageRequestsDto } from '/opt/src/libs/request/message-requests.dto';
+import { checkBody, errorsDto, validateDto } from '/opt/src/libs/utils';
 
 const SERVICE_NAME = 'AppModule';
 
@@ -20,8 +22,12 @@ exports.handler = async function (
   console.info({ SERVICE_NAME, event, context });
   const app = await bootstrap();
   const appService = app.get(AppService);
-  return await appService.message(
-    event.body,
-    event.requestContext?.connectionId,
-  );
+  const param = await validateDto(MessageRequestsDto, checkBody(event.body));
+  const errors = await errorsDto(param);
+  if (errors.length)
+    return await appService.message(
+      event.requestContext?.connectionId,
+      'message error',
+    );
+  return await appService.message(param.data.id, param.data.message);
 };
