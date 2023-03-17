@@ -1,0 +1,74 @@
+service: ${file(ServerlessScripts.js):stackName}-stack
+
+plugins:
+  - serverless-plugin-log-retention
+  - serverless-plugin-split-stacks
+  - serverless-domain-manager
+  - serverless-prune-plugin
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: ${file(ServerlessScripts.js):stage}
+  region: ${file(ServerlessScripts.js):region}
+  profile: ${file(ServerlessScripts.js):profile}
+  logRetentionInDays: ${file(ServerlessScripts.js):logRetentionInDays}
+  timeout: 29
+  environment:
+    NODE_PATH: ${file(ServerlessScripts.js):nodePath}
+    ACCOUNT_ID: ${aws:accountId}
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    WS: ${file(ServerlessScripts.js):domainName}
+
+custom:
+  modulesLayer: ${self:service}-${self:provider.stage}-modules
+  srcLayer: ${self:service}-${self:provider.stage}-src
+  prune:
+    automatic: true
+    includeLayers: true
+  splitStacks:
+    perFunction: true
+    perType: false
+    perGroupFunction: false
+  customDomain:
+    websocket:
+      endpointType: 'REGIONAL'
+      domainName: ${file(ServerlessScripts.js):domainName}
+      basePath: socket
+
+package:
+  individually: true
+  excludeDevDependencies: true
+
+layers:
+  modules:
+    name: ${self:custom.modulesLayer}
+    path: layers/modules
+    compatibleRuntimes:
+      - nodejs16.x
+  src:
+    name: ${self:custom.srcLayer}
+    path: layers/src
+    compatibleRuntimes:
+      - nodejs16.x
+
+functions:
+  connection:
+    handler: dist/handlers/connection/main.handler
+    package:
+      patterns:
+        - '!**'
+        - 'dist/handlers/connection/**'
+    layers:
+      - !Ref ModulesLambdaLayer
+      - !Ref SrcLambdaLayer
+    events:
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+      - websocket:
+          route: $default
+      - websocket:
+          route: message
