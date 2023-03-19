@@ -4,6 +4,7 @@ import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { AppModule } from '/opt/src/app.module';
 import { AppService } from '/opt/src/app.service';
+import { log } from '/opt/src/libs/utils';
 
 const SERVICE_NAME = 'AppModule';
 
@@ -17,7 +18,7 @@ exports.handler = async function (
   event: APIGatewayEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
-  console.info({ SERVICE_NAME, event, context });
+  log('INFO', { SERVICE_NAME, event, context });
   const app = await bootstrap();
   const appService = app.get(AppService);
 

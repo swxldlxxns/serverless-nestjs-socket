@@ -17,7 +17,7 @@ export class AppService {
   constructor(
     private readonly _messageService: MessageService,
     private readonly _lambdaService: LambdaService,
-    private _configService: ConfigService,
+    private readonly _configService: ConfigService,
   ) {
     const {
       lambda: { message },
