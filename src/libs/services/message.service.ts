@@ -1,19 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ApiGatewayManagementApi } from 'aws-sdk';
 
-import { ENV_VARS } from '/opt/src/libs/shared/enviroments';
+import { API_GATEWAY_MANAGEMENT_API } from '/opt/src/libs/shared/injectables';
+import { log } from '/opt/src/libs/utils';
 
 const SERVICE_NAME = 'MessageService';
-const { ws } = ENV_VARS;
-const api = new ApiGatewayManagementApi({
-  endpoint: `${ws}/socket`,
-  apiVersion: 'latest',
-});
 
 @Injectable()
 export class MessageService {
+  constructor(
+    @Inject(API_GATEWAY_MANAGEMENT_API)
+    private readonly _api: ApiGatewayManagementApi,
+  ) {}
+
   async send(ConnectionId: string, Data: string): Promise<void> {
-    console.log({
+    log('INFO', {
       SERVICE_NAME,
       params: {
         ConnectionId,
@@ -21,6 +22,6 @@ export class MessageService {
       },
     });
 
-    await api.postToConnection({ ConnectionId, Data }).promise();
+    await this._api.postToConnection({ ConnectionId, Data }).promise();
   }
 }

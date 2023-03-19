@@ -1,24 +1,34 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import * as AWS from 'aws-sdk';
+import { Lambda } from 'aws-sdk';
 
 import { LambdaService } from '/opt/src/libs/services/lambda.service';
+import { LAMBDA } from '/opt/src/libs/shared/injectables';
 
 describe('LambdaService', () => {
-  const lambda = Object.getPrototypeOf(new AWS.Lambda());
+  let lambda: Lambda;
   let service: LambdaService;
 
   beforeEach(async () => {
     global.console = require('console');
     const MODULE: TestingModule = await Test.createTestingModule({
-      providers: [LambdaService],
+      providers: [
+        LambdaService,
+        Lambda,
+        {
+          provide: LAMBDA,
+          useValue: Lambda,
+        },
+      ],
     }).compile();
+
     service = MODULE.get<LambdaService>(LambdaService);
+    lambda = MODULE.get<Lambda>(LAMBDA);
   });
 
   it('should invoke async', async () => {
-    jest.spyOn(lambda, 'invokeAsync').mockReturnValue({
-      promise: () => null,
-    });
+    lambda.invokeAsync = jest.fn().mockImplementation(() => ({
+      promise: jest.fn().mockResolvedValue(null),
+    }));
     expect(
       await service.asyncInvoke({ FunctionName: 'test', InvokeArgs: 'test' }),
     ).toBeUndefined();
