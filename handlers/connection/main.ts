@@ -20,5 +20,6 @@ exports.handler = async function (
   console.info({ SERVICE_NAME, event, context });
   const app = await bootstrap();
   const appService = app.get(AppService);
+
   return await appService.connect(event.requestContext.connectionId);
 };

@@ -34,6 +34,7 @@ export function formatResponse(
   statusCode: HttpStatus = HttpStatus.OK,
 ): APIGatewayProxyResult {
   console.info({ SERVICE_NAME, statusCode });
+
   return {
     statusCode,
     body: undefined,
@@ -46,5 +47,6 @@ export function errorResponse(
   statusCode: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
 ): APIGatewayProxyResult {
   console.error({ SERVICE_NAME, catchErrors });
+
   return formatResponse(SERVICE_NAME, statusCode);
 }

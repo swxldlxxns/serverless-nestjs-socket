@@ -1,8 +1,14 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ApiGatewayManagementApi, Lambda } from 'aws-sdk';
 
 import { AppService } from '/opt/src/app.service';
 import { LambdaService } from '/opt/src/libs/services/lambda.service';
 import { MessageService } from '/opt/src/libs/services/message.service';
+import {
+  API_GATEWAY_MANAGEMENT_API,
+  LAMBDA,
+} from '/opt/src/libs/shared/injectables';
 import { errorResponse, formatResponse } from '/opt/src/libs/utils';
 
 const SERVICE_NAME = 'AppService';
@@ -15,8 +21,35 @@ describe('AppService', () => {
   beforeEach(async () => {
     global.console = require('console');
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AppService, MessageService, LambdaService],
+      providers: [
+        AppService,
+        LambdaService,
+        MessageService,
+        {
+          provide: ConfigService,
+          useFactory: () => ({
+            get: () => ({
+              accountId: process.env.ACCOUNT_ID,
+              stage: process.env.STAGE,
+              region: process.env.REGION,
+              ws: process.env.WS,
+              lambda: {
+                message: process.env.LAMBDA_MESSAGE,
+              },
+            }),
+          }),
+        },
+        {
+          provide: API_GATEWAY_MANAGEMENT_API,
+          useValue: ApiGatewayManagementApi,
+        },
+        {
+          provide: LAMBDA,
+          useValue: Lambda,
+        },
+      ],
     }).compile();
+
     service = module.get<AppService>(AppService);
     messageService = module.get<MessageService>(MessageService);
     lambdaService = module.get<LambdaService>(LambdaService);
