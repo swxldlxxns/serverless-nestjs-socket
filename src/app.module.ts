@@ -1,6 +1,7 @@
+import { Lambda } from '@aws-sdk/client-lambda';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import { ApiGatewayManagementApi, Lambda } from 'aws-sdk';
+import { ApiGatewayManagementApi } from 'aws-sdk';
 
 import { AppService } from '/opt/src/app.service';
 import config from '/opt/src/config';

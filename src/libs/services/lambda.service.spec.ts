@@ -1,5 +1,5 @@
+import { Lambda } from '@aws-sdk/client-lambda';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Lambda } from 'aws-sdk';
 
 import { LambdaService } from '/opt/src/libs/services/lambda.service';
 import { LAMBDA } from '/opt/src/libs/shared/injectables';
@@ -26,11 +26,12 @@ describe('LambdaService', () => {
   });
 
   it('should invoke async', async () => {
-    lambda.invokeAsync = jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue(null),
-    }));
+    lambda.invoke = jest.fn().mockResolvedValue(null);
     expect(
-      await service.asyncInvoke({ FunctionName: 'test', InvokeArgs: 'test' }),
+      await service.asyncInvoke({
+        FunctionName: 'test',
+        Payload: Buffer.from('test'),
+      }),
     ).toBeUndefined();
   });
 });
