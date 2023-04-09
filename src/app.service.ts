@@ -46,7 +46,7 @@ export class AppService {
 
       await this._lambdaService.asyncInvoke({
         FunctionName: this._lambdaMessage,
-        InvokeArgs: JSON.stringify({ body: JSON.stringify(message) }),
+        Payload: Buffer.from(JSON.stringify({ body: JSON.stringify(message) })),
       });
 
       return formatResponse(SERVICE_NAME);
