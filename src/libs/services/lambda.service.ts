@@ -1,4 +1,4 @@
-import { Lambda } from '@aws-sdk/client-lambda';
+import { InvokeCommandOutput, Lambda } from '@aws-sdk/client-lambda';
 import { InvokeCommandInput } from '@aws-sdk/client-lambda/dist-types/commands/InvokeCommand';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -11,7 +11,7 @@ const SERVICE_NAME = 'LambdaService';
 export class LambdaService {
   constructor(@Inject(LAMBDA) private readonly _lambda: Lambda) {}
 
-  async asyncInvoke(params: InvokeCommandInput): Promise<void> {
+  async asyncInvoke(params: InvokeCommandInput): Promise<InvokeCommandOutput> {
     log('INFO', {
       SERVICE_NAME,
       params: {
@@ -20,6 +20,6 @@ export class LambdaService {
       },
     });
 
-    await this._lambda.invoke({ ...params, InvocationType: 'Event' });
+    return await this._lambda.invoke({ ...params, InvocationType: 'Event' });
   }
 }

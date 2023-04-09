@@ -1,4 +1,4 @@
-import { Lambda } from '@aws-sdk/client-lambda';
+import { InvokeCommandOutput, Lambda } from '@aws-sdk/client-lambda';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiGatewayManagementApi } from 'aws-sdk';
@@ -87,7 +87,10 @@ describe('AppService', () => {
   it('should return connection', async () => {
     jest
       .spyOn(lambdaService, 'asyncInvoke')
-      .mockImplementation(async (): Promise<void> => null);
+      .mockImplementation(
+        async (): Promise<InvokeCommandOutput> =>
+          Promise.resolve({ $metadata: undefined }),
+      );
     expect(await service.connect('1')).toEqual(formatResponse(SERVICE_NAME));
   });
 

@@ -26,12 +26,12 @@ describe('LambdaService', () => {
   });
 
   it('should invoke async', async () => {
-    lambda.invoke = jest.fn().mockResolvedValue(null);
+    lambda.invoke = jest.fn().mockResolvedValue({});
     expect(
       await service.asyncInvoke({
         FunctionName: 'test',
         Payload: Buffer.from('test'),
       }),
-    ).toBeUndefined();
+    ).toEqual({});
   });
 });
